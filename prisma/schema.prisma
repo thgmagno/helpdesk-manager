@@ -17,7 +17,7 @@ model Customer {
   updatedAt DateTime @updatedAt
   tickets   Ticket[]
   userId    String?  @db.ObjectId
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model Ticket {
@@ -29,10 +29,10 @@ model Ticket {
   updatedAt   DateTime @updatedAt
 
   customerId String?   @db.ObjectId
-  customer   Customer? @relation(fields: [customerId], references: [id])
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
   userId String? @db.ObjectId
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model User {
