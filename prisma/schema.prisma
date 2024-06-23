@@ -7,47 +7,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Customer {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  phone     String
-  email     String
-  address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tickets   Ticket[]
-  userId    String?  @db.ObjectId
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-}
-
-model Ticket {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String
-  status      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  customerId String?   @db.ObjectId
-  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
-
-  userId String? @db.ObjectId
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-}
-
 model User {
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
-  email         String?    @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
+  role          Role      @default(CLIENT)
   tickets       Ticket[]
-  customers     Customer[]
+
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+  ticketsProvided         Ticket[]       @relation("ProviderTickets")
+  ticketsReceived         Ticket[]       @relation("ClientTickets")
+  userRelationsAsProvider UserRelation[] @relation("ProviderRelations")
+  userRelationsAsClient   UserRelation[] @relation("ClientRelations")
+  interactions            Interaction[]
+}
+
+model Ticket {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  subject      String
+  description  String
+  status       Status        @default(OPEN)
+  rate         Int?          @default(0)
+  providerId   String        @db.ObjectId
+  clientId     String        @db.ObjectId
+  provider     User          @relation("ProviderTickets", fields: [providerId], references: [id])
+  client       User          @relation("ClientTickets", fields: [clientId], references: [id])
+  interactions Interaction[]
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String? @db.ObjectId
+}
+
+model UserRelation {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  providerId    String  @db.ObjectId
+  clientId      String  @db.ObjectId
+  providerAllow Boolean @default(false)
+  clientAllow   Boolean @default(false)
+  provider      User    @relation("ProviderRelations", fields: [providerId], references: [id])
+  client        User    @relation("ClientRelations", fields: [clientId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Interaction {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  ticketId      String   @db.ObjectId
+  message       String
+  createdAt     DateTime @default(now())
+  createdBy     String   @db.ObjectId
+  ticket        Ticket   @relation(fields: [ticketId], references: [id])
+  createdByUser User     @relation(fields: [createdBy], references: [id])
 }
 
 model Account {
@@ -89,4 +105,15 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum Role {
+  PROVIDER
+  CLIENT
+}
+
+enum Status {
+  OPEN
+  CLOSED
+  CANCELLED
 }

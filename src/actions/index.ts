@@ -1,7 +1,7 @@
-import * as customer from './customer'
-import * as tickets from './tickets'
+import * as user from './user'
+import * as providers from './providers'
 
 export const actions = {
-  customer,
-  tickets,
+  user,
+  providers,
 }

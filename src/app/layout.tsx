@@ -3,9 +3,6 @@ import { Inter } from 'next/font/google'
 import { Header } from '@/components/header'
 import { Providers } from './providers'
 import './globals.css'
-// import { getServerSession } from 'next-auth'
-// import { authOptions } from '@/lib/auth'
-// import { redirect } from 'next/navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,10 +16,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // const session = await getServerSession(authOptions)
-
-  // if (session?.user.id || session?.user.email) redirect('/dashboard')
-
   return (
     <html lang="pt-br">
       <body className={inter.className}>
