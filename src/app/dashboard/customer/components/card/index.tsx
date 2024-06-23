@@ -17,10 +17,9 @@ export function CardCustomer({ customer }: { customer: CustomerType }) {
     )
 
     if (count >= 1) {
-      return alert(`
-          Não pode ser deletado, pois possui ${count} chamado(s) em aberto:
-          ${ticketsName.map((ticket) => ticket).concat(', ')}
-        `)
+      return alert(
+        `Não pode ser deletado, pois possui ${count} chamado(s) em aberto:\n${ticketsName.map((ticket) => `- ${ticket}`).join('\n')}`,
+      )
     }
 
     try {

@@ -1,5 +1,6 @@
 import type { TicketType } from '@/utils/ticket.type'
-import { FiFile, FiTrash2 } from 'react-icons/fi'
+import { FiFile } from 'react-icons/fi'
+import { DeleteTicket } from '../button/DeleteTicket'
 
 type StatusType = 'open' | 'inProgress' | 'closed' | 'cancelled'
 
@@ -23,9 +24,7 @@ export function TicketItem({ ticket }: { ticket: TicketType }) {
           <button>
             <FiFile size={24} className="text-secondary" />
           </button>
-          <button>
-            <FiTrash2 size={24} className="text-danger" />
-          </button>
+          <DeleteTicket ticketId={ticket.id} />
         </td>
       </tr>
     </>
