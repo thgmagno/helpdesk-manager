@@ -10,7 +10,7 @@ export default async function Customers() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/dashboard')
 
-  const relations = await actions.providers.findMyRelations()
+  const relations = await actions.providers.findMyRelations(session.user)
 
   return (
     <Container>

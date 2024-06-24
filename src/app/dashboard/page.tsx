@@ -1,4 +1,5 @@
 import { Container } from '@/components/container'
+import Link from 'next/link'
 
 export default async function Dashboard() {
   return (
@@ -6,6 +7,12 @@ export default async function Dashboard() {
       <main className="mb-2 mt-9">
         <div className="mb-5 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Chamados</h1>
+          <Link
+            href="/dashboard/new-ticket"
+            className="rounded bg-success p-2 text-white"
+          >
+            Cadastrar
+          </Link>
         </div>
 
         <table className="min-w-full">

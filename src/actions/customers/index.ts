@@ -1,20 +1,29 @@
 'use server'
 
-import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
 
-export async function findMyRelations() {
-  const session = await getServerSession(authOptions)
-
-  if (!session) return null
-
+export async function findMyRelations(user: {
+  id: string
+  name: string
+  email: string
+  image?: string | undefined
+  role: 'PROVIDER' | 'CLIENT'
+}) {
   return prisma.userRelation.findMany({
     where: {
-      clientId: session.user.id,
+      clientId: user.id,
     },
     include: {
       provider: true,
+    },
+  })
+}
+
+export async function findProviders(id: string) {
+  return prisma.userRelation.findMany({
+    where: {
+      clientId: id,
+      AND: [{ providerAllow: true }],
     },
   })
 }

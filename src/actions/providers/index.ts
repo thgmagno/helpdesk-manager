@@ -89,17 +89,28 @@ export async function addCustomer(customer: User) {
   return { success: true, message: '' }
 }
 
-export async function findMyRelations() {
-  const session = await getServerSession(authOptions)
-
-  if (!session) return null
-
+export async function findMyRelations(user: {
+  id: string
+  name: string
+  email: string
+  image?: string | undefined
+  role: 'PROVIDER' | 'CLIENT'
+}) {
   return prisma.userRelation.findMany({
     where: {
-      providerId: session.user.id,
+      providerId: user.id,
     },
     include: {
       client: true,
+    },
+  })
+}
+
+export async function findCustomers(id: string) {
+  return prisma.userRelation.findMany({
+    where: {
+      providerId: id,
+      AND: [{ clientAllow: true }],
     },
   })
 }
