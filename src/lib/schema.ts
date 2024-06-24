@@ -1,5 +1,5 @@
 import { z } from 'zod'
 
 export const SearchCustomersSchema = z.object({
-  email: z.string().email('E-mail inválido'),
+  searchTerm: z.string().min(1, 'Digite um termo para buscar'),
 })

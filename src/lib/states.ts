@@ -1,6 +1,11 @@
+import { User } from '@prisma/client'
+
 export interface SearchCustomerFormState {
+  data: {
+    customers?: User[]
+  }
   errors: {
-    email?: string[]
+    searchTerm?: string[]
     _form?: string
   }
 }

@@ -6,8 +6,6 @@ import { SearchCustomersSchema } from '@/lib/schema'
 import { SearchCustomerFormState } from '@/lib/states'
 import { User } from '@prisma/client'
 import { getServerSession } from 'next-auth'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 
 export async function searchCustomer(
   formState: SearchCustomerFormState,
@@ -16,50 +14,64 @@ export async function searchCustomer(
   const session = await getServerSession(authOptions)
 
   const parsed = SearchCustomersSchema.safeParse({
-    email: formData.get('email'),
+    searchTerm: formData.get('searchTerm'),
   })
 
   if (!session) {
-    return { errors: { _form: 'Não foi possível realizar a busca' } }
+    return { data: {}, errors: { _form: 'Não foi possível realizar a busca' } }
   }
 
   if (!parsed.success) {
-    return { errors: parsed.error.flatten().fieldErrors }
+    return { data: {}, errors: parsed.error.flatten().fieldErrors }
   }
 
-  if (parsed.data.email === session?.user.email) {
+  if (parsed.data.searchTerm === session?.user.email) {
     return {
+      data: {},
       errors: { _form: 'Não é possível adicionar a si mesmo' },
     }
   }
 
+  let customers: User[] | null = null
+
   try {
-    const customer = await prisma.user.findUnique({
-      where: { email: parsed.data.email },
+    customers = await prisma.user.findMany({
+      where: {
+        OR: [
+          { email: parsed.data.searchTerm },
+          { name: { contains: parsed.data.searchTerm, mode: 'insensitive' } },
+        ],
+        AND: [{ email: { not: session.user.email } }],
+      },
     })
 
-    if (!customer) {
-      return { errors: { _form: 'Nenhum usuário encontrado para este e-mail' } }
-    }
-
-    const added = await addCustomer(customer, session.user.id)
-
-    if (!added.success) {
-      return { errors: { _form: added.message } }
+    if (!customers.length) {
+      return {
+        data: {},
+        errors: { _form: 'Nenhum cliente encontrado' },
+      }
     }
   } catch (err) {
     return {
+      data: {},
       errors: { _form: 'Não foi possível realizar a busca' },
     }
   }
 
-  revalidatePath('/')
-  redirect('/dashboard/customers')
+  return { data: { customers }, errors: {} }
 }
 
-async function addCustomer(customer: User, providerId: string) {
+export async function addCustomer(customer: User) {
+  const session = await getServerSession(authOptions)
+
+  if (!session)
+    return {
+      success: false,
+      message: 'Atributos insuficientes para realizar uma busca',
+    }
+
   const relationAlreadyExists = await prisma.userRelation.count({
-    where: { providerId, clientId: customer.id },
+    where: { providerId: session.user.id, clientId: customer.id },
   })
 
   if (relationAlreadyExists) {
@@ -68,11 +80,26 @@ async function addCustomer(customer: User, providerId: string) {
 
   await prisma.userRelation.create({
     data: {
-      providerId,
+      providerId: session.user.id,
       clientId: customer.id,
       providerAllow: true,
     },
   })
 
   return { success: true, message: '' }
+}
+
+export async function findMyRelations() {
+  const session = await getServerSession(authOptions)
+
+  if (!session) return null
+
+  return prisma.userRelation.findMany({
+    where: {
+      providerId: session.user.id,
+    },
+    include: {
+      client: true,
+    },
+  })
 }
