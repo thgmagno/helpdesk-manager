@@ -58,13 +58,13 @@ export function RelationRow({ relation, role }: Props) {
       {role === 'CLIENT' && !relation.clientAllow && (
         <div className="flex flex-col overflow-hidden rounded-lg">
           <button
-            onClick={() => actions.user.manageRequest(relation, true, role)}
+            onClick={() => actions.user.manageRequest(relation, true)}
             className="bg-success/90 px-2 py-0.5 text-sm text-white duration-300 hover:bg-success active:scale-95"
           >
             Aceitar
           </button>
           <button
-            onClick={() => actions.user.manageRequest(relation, false, role)}
+            onClick={() => actions.user.manageRequest(relation, false)}
             className="bg-danger/90 px-2 py-0.5 text-sm text-white duration-300 hover:bg-danger active:scale-95"
           >
             Recusar
@@ -75,13 +75,13 @@ export function RelationRow({ relation, role }: Props) {
       {role === 'PROVIDER' && !relation.providerAllow && (
         <div className="flex flex-col overflow-hidden rounded-lg">
           <button
-            onClick={() => actions.user.manageRequest(relation, true, role)}
+            onClick={() => actions.user.manageRequest(relation, true)}
             className="bg-success/90 px-2 py-0.5 text-sm text-white duration-300 hover:bg-success active:scale-95"
           >
             Aceitar
           </button>
           <button
-            onClick={() => actions.user.manageRequest(relation, false, role)}
+            onClick={() => actions.user.manageRequest(relation, false)}
             className="bg-danger/90 px-2 py-0.5 text-sm text-white duration-300 hover:bg-danger active:scale-95"
           >
             Recusar
@@ -93,7 +93,7 @@ export function RelationRow({ relation, role }: Props) {
 
       {relation.clientAllow && relation.providerAllow && (
         <FiTrash2
-          onClick={() => actions.user.manageRequest(relation, false, role)}
+          onClick={() => actions.user.manageRequest(relation, false)}
           size={20}
           className="cursor-pointer text-danger"
         />

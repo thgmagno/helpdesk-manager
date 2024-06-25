@@ -1,7 +1,12 @@
+import { actions } from '@/actions'
 import { Container } from '@/components/container'
+import { formatDate } from '@/utils/formatDate'
 import Link from 'next/link'
+import { FiChevronRight } from 'react-icons/fi'
 
 export default async function Dashboard() {
+  const tickets = await actions.user.findAllTickets()
+
   return (
     <Container>
       <main className="mb-2 mt-9">
@@ -26,7 +31,25 @@ export default async function Dashboard() {
               <th className="text-left font-medium uppercase">#</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            {tickets?.map((ticket) => (
+              <tr>
+                <td>{ticket.clientId}</td>
+                <td>{formatDate(ticket.createdAt)}</td>
+                <td>{ticket.status}</td>
+                <td>
+                  <FiChevronRight size={20} />
+                </td>
+              </tr>
+            ))}
+            {tickets?.length === 0 && (
+              <tr>
+                <td colSpan={4} className="h-24 text-center text-muted">
+                  Nenhum chamado registrado
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </main>
     </Container>

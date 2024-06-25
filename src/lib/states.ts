@@ -2,6 +2,7 @@ import { User } from '@prisma/client'
 
 export interface TicketFormState {
   errors: {
+    recipient?: string[]
     subject?: string[]
     description?: string[]
     _form?: string

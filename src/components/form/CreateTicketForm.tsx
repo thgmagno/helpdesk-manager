@@ -4,23 +4,31 @@ import { actions } from '@/actions'
 import { useFormState } from 'react-dom'
 import { Input } from '../input'
 import { Container } from '../container'
+import { CustomerRelationType, ProviderRelationType } from '@/lib/types'
+import { ButtonFormSubmit } from '../button/ButtonFormSubmit'
 
 interface Props {
   role: 'PROVIDER' | 'CLIENT'
+  customerRelation?: CustomerRelationType[]
+  providerRelation?: ProviderRelationType[]
 }
 
-export function CreateTicketForm({ role }: Props) {
+export function CreateTicketForm({
+  role,
+  customerRelation,
+  providerRelation,
+}: Props) {
   const [formState, action] = useFormState(actions.user.createTicket, {
     errors: {},
   })
 
   return (
     <Container>
-      <form action="" className="flex flex-col space-y-3">
+      <form action={action} className="mb-24 flex flex-col space-y-3">
         <Input
           name="subject"
           label="Assunto:"
-          placeholder="Assunto do chamado"
+          placeholder="Sobre o que você quer falar"
           errorMessage={formState?.errors.subject}
           isInvalid={!!formState?.errors.subject}
         />
@@ -47,13 +55,35 @@ export function CreateTicketForm({ role }: Props) {
               : 'Selecione a empresa'}
             :
           </label>
-          <select name="recipient" id="recipient"></select>
-          {formState?.errors.description && (
-            <p className="text-sm text-danger">
-              {formState.errors.description}
-            </p>
+          <select
+            name="recipient"
+            id="recipient"
+            className={`h-11 w-full rounded-md border p-2 shadow-sm outline-none ${formState?.errors.recipient ? 'border-danger' : 'border-muted'}`}
+          >
+            <option value="">Selecionar</option>
+            {role === 'CLIENT' &&
+              customerRelation
+                ?.filter((item) => item.providerAllow)
+                .map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.provider.name}
+                  </option>
+                ))}
+            {role === 'PROVIDER' &&
+              providerRelation
+                ?.filter((item) => item.clientAllow)
+                .map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.client.name}
+                  </option>
+                ))}
+          </select>
+          {formState?.errors.recipient && (
+            <p className="text-sm text-danger">{formState.errors.recipient}</p>
           )}
         </div>
+
+        <ButtonFormSubmit title="Criar chamado" />
       </form>
     </Container>
   )

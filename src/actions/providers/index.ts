@@ -6,6 +6,7 @@ import { SearchCustomersSchema } from '@/lib/schema'
 import { SearchCustomerFormState } from '@/lib/states'
 import { User } from '@prisma/client'
 import { getServerSession } from 'next-auth'
+import { revalidatePath } from 'next/cache'
 
 export async function searchCustomer(
   formState: SearchCustomerFormState,
@@ -86,7 +87,8 @@ export async function addCustomer(customer: User) {
     },
   })
 
-  return { success: true, message: '' }
+  revalidatePath('/')
+  return { success: true, message: 'Convite enviado com sucesso!' }
 }
 
 export async function findMyRelations(user: {
@@ -102,15 +104,6 @@ export async function findMyRelations(user: {
     },
     include: {
       client: true,
-    },
-  })
-}
-
-export async function findCustomers(id: string) {
-  return prisma.userRelation.findMany({
-    where: {
-      providerId: id,
-      AND: [{ clientAllow: true }],
     },
   })
 }

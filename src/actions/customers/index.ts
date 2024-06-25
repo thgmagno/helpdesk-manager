@@ -18,12 +18,3 @@ export async function findMyRelations(user: {
     },
   })
 }
-
-export async function findProviders(id: string) {
-  return prisma.userRelation.findMany({
-    where: {
-      clientId: id,
-      AND: [{ providerAllow: true }],
-    },
-  })
-}
